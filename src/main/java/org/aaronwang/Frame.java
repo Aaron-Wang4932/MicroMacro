@@ -19,7 +19,7 @@ public class Frame extends JFrame implements ActionListener {
         this.setIconImage(new ImageIcon("resources/title.png").getImage());
 
         this.add(homePanel);
-
+        //this.add(settingsPanel);
 
         this.setResizable(false);
         this.pack();
@@ -37,6 +37,5 @@ public class Frame extends JFrame implements ActionListener {
         this.remove(oldPanel);
         this.add(newPanel);
         this.pack();
-        this.setLocationRelativeTo(null);
     }
 }

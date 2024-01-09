@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 public class HomePanel extends GradientPanel {
     public HomePanel(ActionListener gui) {
-        super(new Color(0x1c1b1f), new Color(0x543097)); // Base background, on primary
+        super(new Color(0x1d1b1e), new Color(0x3d137f), GradientPanel.VERTICAL_FILL); // Base background, on primary
         this.setPreferredSize(new Dimension(1000, 624));
         this.setLayout(null);
 
@@ -27,7 +27,7 @@ public class HomePanel extends GradientPanel {
 
         JButton macroRecorder = new JButton("Macro Recorder");
         macroRecorder.setContentAreaFilled(false);
-        macroRecorder.setForeground(new Color(0xcdc2db));
+        macroRecorder.setForeground(new Color(0xcdc2db)); // Secondary
         macroRecorder.setFont(new Font("Century Gothic", Font.BOLD | Font.ITALIC, 24));
         macroRecorder.setFocusable(false);
 
@@ -45,7 +45,7 @@ public class HomePanel extends GradientPanel {
         settings.addActionListener(gui);
 
         this.add(title);
-        title.setBounds(284, 20, 432, 132); // 80 px. padding between components
+        title.setBounds(284, 20, 432, 132);
         this.add(macroRecorder);
         macroRecorder.setBounds(300, 232, 400, 64);
         this.add(autoClicker);
