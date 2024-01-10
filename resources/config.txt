@@ -1,4 +1,4 @@
-recording-delay: 2000
-pref-keybind: 17, 82
-theme: violet
-show-startup-hints: False
+recording-delay: 89
+pref-keybind: 18, 77
+theme: themes-are-not-supported-yet.
+show-startup-hints: True

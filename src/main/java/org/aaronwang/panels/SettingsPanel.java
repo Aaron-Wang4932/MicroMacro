@@ -8,15 +8,20 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
-public class SettingsPanel extends GradientPanel implements FocusListener, KeyListener {
+public class SettingsPanel extends GradientPanel implements ActionListener, FocusListener, KeyListener {
     private ActionListener gui;
+    private JButton backButton;
+    private JTextField recordDelayField;
     private JTextField keybindField;
-    private ArrayList<Integer> enteredKeybinds = new ArrayList<>(Arrays.asList(0)); // Keeps track of keybinds in progress of being entered
     private Border keybindFieldDefaultBorder;
-    private int recordingDelayMS;
-    private int[] keybinds = new int[2]; // temporary assignment; keeps track of keybind codes
+    private JComboBox themeSelector;
+    private JToggleButton hintsToggle;
+    private ArrayList<Integer> enteredKeybinds = new ArrayList<>(List.of(0)); // Keeps track of keybinds in progress of being entered
+    private int[] keybinds = new int[2]; // keeps track of keybind codes
     private String keybindString; // Keeps track of keybinds as a string representation
+    private int recordingDelayMS;
     private String theme;
     private boolean showHints;
     public SettingsPanel(ActionListener gui) {
@@ -42,7 +47,7 @@ public class SettingsPanel extends GradientPanel implements FocusListener, KeyLi
         delayLabel.setBackground(new Color(0x643b46)); // Tertiary container
         delayLabel.setFont(new Font("Century Gothic", Font.BOLD, 20));
 
-        JTextField recordDelayField = new JTextField(recordingDelayMS + "");
+        recordDelayField = new JTextField(recordingDelayMS + "");
         recordDelayField.setFont(new Font("Century Gothic", Font.BOLD, 14));
         recordDelayField.setBackground(new Color(0x4b4358)); // Secondary container
         recordDelayField.setForeground(new Color(0xcdc2db)); // Secondary
@@ -69,7 +74,7 @@ public class SettingsPanel extends GradientPanel implements FocusListener, KeyLi
         themeLabel.setBackground(new Color(0x643b46)); // Tertiary container
         themeLabel.setFont(new Font("Century Gothic", Font.BOLD, 20));
 
-        JComboBox themeSelector = new JComboBox();
+        themeSelector = new JComboBox();
         themeSelector.addItem("Themes are not supported yet.");
         themeSelector.setBackground(new Color(0x4b4358)); // Secondary container
         themeSelector.setForeground(new Color(0xcdc2db)); // Secondary
@@ -80,7 +85,7 @@ public class SettingsPanel extends GradientPanel implements FocusListener, KeyLi
         hintsLabel.setBackground(new Color(0x643b46)); // Tertiary container
         hintsLabel.setFont(new Font("Century Gothic", Font.BOLD, 20));
 
-        JToggleButton hintsToggle = new JToggleButton((showHints + "").substring(0, 1).toUpperCase() + (showHints + "").substring(1).toLowerCase(), showHints);
+        hintsToggle = new JToggleButton((showHints + "").substring(0, 1).toUpperCase() + (showHints + "").substring(1).toLowerCase(), showHints);
         hintsToggle.setFocusable(false);
         hintsToggle.setFont(new Font("Century Gothic", Font.BOLD, 14));
         hintsToggle.setBackground(new Color(0x4b4358)); // Secondary container
@@ -96,15 +101,12 @@ public class SettingsPanel extends GradientPanel implements FocusListener, KeyLi
             }
         });
 
-        JButton backButton = new JButton("Back");
+        backButton = new JButton("Back");
         backButton.setContentAreaFilled(false);
         backButton.setForeground(new Color(0xcdc2db));
         backButton.setFont(new Font("Century Gothic", Font.BOLD | Font.ITALIC, 24));
         backButton.setFocusable(false);
-        backButton.addActionListener(gui);
-
-
-
+        backButton.addActionListener(this);
 
         this.add(title);
         title.setBounds(370, 20, 260, 110);
@@ -142,9 +144,8 @@ public class SettingsPanel extends GradientPanel implements FocusListener, KeyLi
                     recordingDelayMS = Integer.parseInt(temp);
                 } else if(temp.startsWith("pref-keybind: ")) {
                     temp = temp.replace("pref-keybind: ", "");
-                    // Given a string containing sequences of numeric characters, separated by a known buffer sequence,
-                    // how can I isolate each sequence and assign its value to an element of an array?
-
+                    keybinds[0] = Integer.parseInt(temp.split(", ")[0]);
+                    keybinds[1] = Integer.parseInt(temp.split(", ")[1]);
                     for(int i = 0; i < keybinds.length; i++) {
                         if(i != keybinds.length - 1) keybindString += KeyEvent.getKeyText(keybinds[i]) + " & ";
                         else keybindString += KeyEvent.getKeyText(keybinds[i]);
@@ -196,11 +197,10 @@ public class SettingsPanel extends GradientPanel implements FocusListener, KeyLi
         }
         if(enteredKeybinds.size() == 3) { // Max keybind size of 2
             this.requestFocus();
-            keybinds[0] = enteredKeybinds.get(0);
-            keybinds[1] = enteredKeybinds.get(1);
+            keybinds[0] = enteredKeybinds.get(1);
+            keybinds[1] = enteredKeybinds.get(2);
             keybindString = KeyEvent.getKeyText(enteredKeybinds.get(1)) + " & " + KeyEvent.getKeyText(enteredKeybinds.get(2));
             keybindField.setText(keybindString);
-
             enteredKeybinds.clear();
             enteredKeybinds.add(0);
         }
@@ -208,5 +208,54 @@ public class SettingsPanel extends GradientPanel implements FocusListener, KeyLi
 
     @Override
     public void keyReleased(KeyEvent e) {}
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        ActionEvent event = new ActionEvent(backButton, 69, "go back");
+        boolean changedSaved = JOptionPane.showConfirmDialog((JFrame) gui, "Would you like to save your changes?", "Note: ", JOptionPane.YES_NO_OPTION) == 0;
+
+        if(!changedSaved) return;
+
+        try {
+            Integer.parseInt(recordDelayField.getText());
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog((JFrame) gui, "Please ensure your specified delay is a number!", "Error!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String keyConfig  = keybinds[0] + ", " + keybinds[1];
+        writeConfig(recordDelayField.getText(), keyConfig, themeSelector.getSelectedItem().toString().toLowerCase().replaceAll(" ", "-"), hintsToggle.getText());
+
+        backButton.removeActionListener(this);
+        backButton.addActionListener(gui);
+        backButton.getActionListeners()[0].actionPerformed(event);
+        backButton.removeActionListener(gui);
+        backButton.addActionListener(this);
+    }
+
+    private void writeConfig(String rDelay, String prefKeybind, String theme, String showHints) {
+        String[] configs = new String[4];
+        String temp;
+        try{
+            BufferedReader configReader = new BufferedReader(new FileReader("resources/config.txt"));
+            BufferedWriter configWriter = new BufferedWriter(new FileWriter("resources/config.txt"));
+            int i = 0;
+            while((temp = configReader.readLine()) != null) {
+                configs[i] = temp;
+                i++;
+            }
+            configReader.close();
+
+            configs[0] = "recording-delay: " + rDelay;
+            configs[1] = "pref-keybind: " + prefKeybind;
+            configs[2] = "theme: " + theme;
+            configs[3] = "show-startup-hints: " + showHints;
+
+            for(String s : configs) {
+                configWriter.write(s + "\n");
+            }
+            configWriter.close();
+        } catch(IOException ignored){}
+    }
 }
 
