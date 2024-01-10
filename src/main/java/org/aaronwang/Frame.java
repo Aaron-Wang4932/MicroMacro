@@ -31,11 +31,14 @@ public class Frame extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         // Main Panel buttons:
         if(e.getSource() == homePanel.getComponent(3)) setPanel(homePanel, settingsPanel);
+        // Settings Panel buttons:
+        else if(e.getSource() == settingsPanel.getComponent(1)) setPanel(settingsPanel, homePanel);
     }
 
     public void setPanel(JPanel oldPanel, JPanel newPanel) {
         this.remove(oldPanel);
         this.add(newPanel);
+        this.repaint();
         this.pack();
     }
 }
