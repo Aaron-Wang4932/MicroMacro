@@ -3,10 +3,8 @@ package org.aaronwang.panels;
 import org.aaronwang.UI.*;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 public class HomePanel extends GradientPanel {
     public HomePanel(ActionListener gui) {

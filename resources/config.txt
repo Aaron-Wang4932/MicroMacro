@@ -1,4 +1,4 @@
-recording-delay: 89
-pref-keybind: 18, 77
+recording-delay: 3465
+pref-keybind: 16, 17
 theme: themes-are-not-supported-yet.
-show-startup-hints: True
+show-startup-hints: False

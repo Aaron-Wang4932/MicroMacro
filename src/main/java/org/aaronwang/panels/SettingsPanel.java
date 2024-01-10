@@ -25,6 +25,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
     private String theme;
     private boolean showHints;
     public SettingsPanel(ActionListener gui) {
+        // Constructs settings panel with gradient!!
         super(new Color(0x3d137f), new Color(0x342d40), GradientPanel.VERTICAL_FILL);
         this.gui = gui;
         this.setPreferredSize(new Dimension(1000, 624));
@@ -138,6 +139,9 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
         try {
             String temp;
             BufferedReader configReader = new BufferedReader(new FileReader("resources/config.txt"));
+
+            // While loop runs as long as the next line has contents; internal if-else structure determines which line we are on
+            // and sets configs accordingly
             while((temp = configReader.readLine()) != null) {
                 if(temp.startsWith("recording-delay: ")) {
                     temp = temp.replace("recording-delay: ", "");
@@ -172,6 +176,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
 
     @Override
     public void focusGained(FocusEvent e) {
+        // When textfield is focused, add a key listener to it to listen for keybinds. Change the appearance for user feedback.
         keybindField.addKeyListener(this);
         keybindField.setBorder(BorderFactory.createLineBorder(new Color(0xffb4ab), 3));
         keybindField.setToolTipText("Recording your key presses...Press ESC to save/cancel.");
@@ -179,6 +184,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
 
     @Override
     public void focusLost(FocusEvent e) {
+        // Unfocused -> remove the key listener.
         keybindField.removeKeyListener(this);
         keybindField.setBorder(keybindFieldDefaultBorder);
         keybindField.setToolTipText(null);
@@ -189,12 +195,20 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
 
     @Override
     public void keyPressed(KeyEvent e) {
+        // Allow users to exit keybind setting by pressing escape, causing the panel to gain focus.
         if(KeyEvent.getKeyText(e.getKeyCode()).equals("Escape")) {
             this.requestFocus();
         }
+        // If structure disallows duplicate key presses to be counted as keybinds.
+        // If the current received keycode is the last entry in the ArrayList,
+        // The logic is not entered.
         if(enteredKeybinds.get(enteredKeybinds.size() - 1) != e.getKeyCode()) {
             enteredKeybinds.add(e.getKeyCode());
         }
+
+        // A max keybind size of 2 keys is permitted.
+        // Upon reaching 2 keys (including buffer element)
+        // Panel gains focus and the temporary ArrayList is cleared.
         if(enteredKeybinds.size() == 3) { // Max keybind size of 2
             this.requestFocus();
             keybinds[0] = enteredKeybinds.get(1);
@@ -212,6 +226,8 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
     @Override
     public void actionPerformed(ActionEvent e) {
         ActionEvent event = new ActionEvent(backButton, 69, "go back");
+
+        // This option pane returns an int. We check to see if that int corresponds to the "yes" option.
         boolean changedSaved = JOptionPane.showConfirmDialog((JFrame) gui, "Would you like to save your changes?", "Note: ", JOptionPane.YES_NO_OPTION) == 0;
 
         if(!changedSaved) return;
@@ -223,9 +239,13 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
             return;
         }
 
+        // Formats user config and writes it.
         String keyConfig  = keybinds[0] + ", " + keybinds[1];
-        writeConfig(recordDelayField.getText(), keyConfig, themeSelector.getSelectedItem().toString().toLowerCase().replaceAll(" ", "-"), hintsToggle.getText());
+        String theme = themeSelector.getSelectedItem().toString().toLowerCase().replaceAll(" ", "-");
 
+        writeConfig(recordDelayField.getText(), keyConfig, theme, hintsToggle.getText());
+
+        // Send action event to Frame.
         backButton.removeActionListener(this);
         backButton.addActionListener(gui);
         backButton.getActionListeners()[0].actionPerformed(event);
