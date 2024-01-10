@@ -150,6 +150,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
                     temp = temp.replace("pref-keybind: ", "");
                     keybinds[0] = Integer.parseInt(temp.split(", ")[0]);
                     keybinds[1] = Integer.parseInt(temp.split(", ")[1]);
+                    keybindString = "";
                     for(int i = 0; i < keybinds.length; i++) {
                         if(i != keybinds.length - 1) keybindString += KeyEvent.getKeyText(keybinds[i]) + " & ";
                         else keybindString += KeyEvent.getKeyText(keybinds[i]);
@@ -230,7 +231,23 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
         // This option pane returns an int. We check to see if that int corresponds to the "yes" option.
         boolean changedSaved = JOptionPane.showConfirmDialog((JFrame) gui, "Would you like to save your changes?", "Note: ", JOptionPane.YES_NO_OPTION) == 0;
 
-        if(!changedSaved) return;
+        if(!changedSaved) {
+            backButton.removeActionListener(this);
+            backButton.addActionListener(gui);
+            backButton.getActionListeners()[0].actionPerformed(event);
+            backButton.removeActionListener(gui);
+            backButton.addActionListener(this);
+
+            readConfig();
+            recordDelayField.setText(recordingDelayMS + "");
+            keybindField.setText(keybindString);
+            hintsToggle.setSelected(showHints);
+            if(hintsToggle.isSelected()) hintsToggle.setForeground(new Color(0x635b70)); // Secondary (light mode)
+            else hintsToggle.setForeground(new Color(0xcdc2db)); // Secondary
+            hintsToggle.setText((showHints + "").substring(0, 1).toUpperCase() + (showHints + "").substring(1).toLowerCase());
+
+            return;
+        };
 
         try {
             Integer.parseInt(recordDelayField.getText());
