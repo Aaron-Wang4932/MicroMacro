@@ -31,6 +31,7 @@ public class SettingsPanel extends GradientPanel implements FocusListener {
 
         JTextField recordDelay = new JTextField();
         recordDelay.setFont(new Font("Century Gothic", Font.BOLD, 14));
+        recordDelay.setText("CTRL + V");
 
 
         JLabel keybindLabel = new JLabel("<html><u>Preferred Recording Keybind</u></html>", JLabel.CENTER);
@@ -56,10 +57,10 @@ public class SettingsPanel extends GradientPanel implements FocusListener {
         this.add(delayLabel);
         delayLabel.setBounds(110, 189, 212, 50);
         this.add(recordDelay);
-        recordDelay.setBounds(790, 189, 100, 35);
+        recordDelay.setBounds(790, 189, 100, 25);
 
         this.add(keybindLabel);
-        keybindLabel.setBounds(110, 298, 281, 50);
+        keybindLabel.setBounds(110, 298, 282, 50);
 
         this.add(themeLabel);
         themeLabel.setBounds(110, 407, 160, 50);
