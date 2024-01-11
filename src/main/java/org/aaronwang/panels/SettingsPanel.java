@@ -16,7 +16,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
     private JTextField recordDelayField;
     private JTextField keybindField;
     private Border keybindFieldDefaultBorder;
-    private JComboBox themeSelector;
+    private JComboBox<String> themeSelector;
     private JToggleButton hintsToggle;
     private ArrayList<Integer> enteredKeybinds = new ArrayList<>(List.of(0)); // Keeps track of keybinds in progress of being entered
     private int[] keybinds = new int[2]; // keeps track of keybind codes
@@ -75,7 +75,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
         themeLabel.setBackground(new Color(0x643b46)); // Tertiary container
         themeLabel.setFont(new Font("Century Gothic", Font.BOLD, 20));
 
-        themeSelector = new JComboBox();
+        themeSelector = new JComboBox<>();
         themeSelector.addItem("Themes are not supported yet.");
         themeSelector.setBackground(new Color(0x4b4358)); // Secondary container
         themeSelector.setForeground(new Color(0xcdc2db)); // Secondary
