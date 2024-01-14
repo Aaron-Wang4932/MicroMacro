@@ -28,6 +28,7 @@ public class HomePanel extends GradientPanel {
         macroRecorder.setForeground(new Color(0xcdc2db)); // Secondary
         macroRecorder.setFont(new Font("Century Gothic", Font.BOLD | Font.ITALIC, 24));
         macroRecorder.setFocusable(false);
+        macroRecorder.addActionListener(gui);
 
         JButton autoClicker = new JButton("Auto-Clicker");
         autoClicker.setContentAreaFilled(false);

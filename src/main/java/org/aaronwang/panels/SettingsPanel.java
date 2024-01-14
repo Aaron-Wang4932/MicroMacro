@@ -26,7 +26,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
     private boolean showHints;
     public SettingsPanel(ActionListener gui) {
         // Constructs settings panel with gradient!!
-        super(new Color(0x3d137f), new Color(0x342d40), GradientPanel.VERTICAL_FILL);
+        super(new Color(0x1d1b1e), new Color(0x4a2530), GradientPanel.DIAGONAL_FILL);
         this.gui = gui;
         this.setPreferredSize(new Dimension(1000, 624));
         this.setLayout(null);
