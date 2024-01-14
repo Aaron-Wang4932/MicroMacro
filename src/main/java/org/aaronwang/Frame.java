@@ -11,6 +11,7 @@ public class Frame extends JFrame implements ActionListener {
     JPanel homePanel = new HomePanel(this);
     JPanel macroPanel = new MacroPanel(this);
     JPanel settingsPanel = new SettingsPanel(this);
+    JPanel minimizedPanel = new MinimizedPanel();
 
     public Frame() {
         this.setTitle("MicroMacro");
