@@ -13,10 +13,10 @@ public class HomePanel extends GradientPanel {
         this.setLayout(null);
 
         JLabel title = new JLabel("MicroMacro", JLabel.CENTER);
-        title.setForeground(new Color(0xd3bbff)); // Primary
+        title.setForeground(new Color(0xD8C6FA)); // Primary
         title.setFont(new Font("Century Gothic", Font.BOLD | Font.ITALIC, 60));
         title.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(0x543097), 8, true), // Primary container
+                BorderFactory.createLineBorder(new Color(0xB093E0), 6, true), // Primary container
                 "Aaron's",
                 TitledBorder.LEFT,
                 TitledBorder.TOP,

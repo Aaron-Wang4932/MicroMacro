@@ -26,7 +26,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
     private boolean showHints;
     public SettingsPanel(ActionListener gui) {
         // Constructs settings panel with gradient!!
-        super(new Color(0x1d1b1e), new Color(0x4a2530), GradientPanel.DIAGONAL_FILL);
+        super(new Color(0x1d1b1e), new Color(0x363357), GradientPanel.VERTICAL_FILL);
         this.gui = gui;
         this.setPreferredSize(new Dimension(1000, 624));
         this.setLayout(null);
@@ -44,7 +44,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
                 new Color(0xe9def8))); // On secondary container
 
         JLabel delayLabel = new JLabel("<html><u>Recording delay (ms)</u></html>", JLabel.CENTER);
-        delayLabel.setForeground(new Color(0xf0b7c5)); // Tertiary
+        delayLabel.setForeground(new Color(0xcdc2db)); // Tertiary
         delayLabel.setBackground(new Color(0x643b46)); // Tertiary container
         delayLabel.setFont(new Font("Century Gothic", Font.BOLD, 20));
 
@@ -56,7 +56,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
         recordDelayField.setHorizontalAlignment(JTextField.RIGHT);
 
         JLabel keybindLabel = new JLabel("<html><u>Preferred Recording Keybind</u></html>", JLabel.CENTER);
-        keybindLabel.setForeground(new Color(0xf0b7c5)); // Tertiary
+        keybindLabel.setForeground(new Color(0xcdc2db)); // Tertiary
         keybindLabel.setBackground(new Color(0x643b46)); // Tertiary container
         keybindLabel.setFont(new Font("Century Gothic", Font.BOLD, 20));
 
@@ -71,7 +71,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
         keybindField.addFocusListener(this);
 
         JLabel themeLabel = new JLabel("<html><u>Preferred Theme</u></html>", JLabel.CENTER);
-        themeLabel.setForeground(new Color(0xf0b7c5)); // Tertiary
+        themeLabel.setForeground(new Color(0xcdc2db)); // Tertiary
         themeLabel.setBackground(new Color(0x643b46)); // Tertiary container
         themeLabel.setFont(new Font("Century Gothic", Font.BOLD, 20));
 
@@ -82,7 +82,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
         themeSelector.setFont(new Font("Century Gothic", Font.BOLD, 14));
 
         JLabel hintsLabel = new JLabel("<html><u>Show Startup Hints</u></html>", JLabel.CENTER);
-        hintsLabel.setForeground(new Color(0xf0b7c5)); // Tertiary
+        hintsLabel.setForeground(new Color(0xcdc2db)); // Tertiary
         hintsLabel.setBackground(new Color(0x643b46)); // Tertiary container
         hintsLabel.setFont(new Font("Century Gothic", Font.BOLD, 20));
 

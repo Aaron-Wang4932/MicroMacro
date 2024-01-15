@@ -107,8 +107,8 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
 
     private void calcInterval() {
         long time = System.currentTimeMillis() - clock;
-//        if(output.getText().isEmpty()) output.setText("WAIT " + time);
-//        else output.append("\nWAIT " + time);
+        if(output.getText().isEmpty()) output.setText("WAIT " + time);
+        else output.append("\nWAIT " + time);
         temp.add("WAIT " + time);
         clock = System.currentTimeMillis();
         output.setCaretPosition(output.getDocument().getLength());

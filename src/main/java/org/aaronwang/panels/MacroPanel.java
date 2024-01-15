@@ -49,7 +49,7 @@ public class MacroPanel extends GradientPanel implements ActionListener {
 
         recBtn = new JButton("Record File");
         recBtn.setContentAreaFilled(false);
-        recBtn.setForeground(new Color(0x93000a)); // Tertiary
+        recBtn.setForeground(new Color(0xcdc2db)); // Tertiary
         recBtn.setFont(new Font("Century Gothic", Font.BOLD | Font.ITALIC, 24));
         recBtn.setFocusable(false);
         recBtn.addActionListener(this);
