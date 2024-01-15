@@ -19,6 +19,7 @@ public class MacroPanel extends GradientPanel implements ActionListener {
     private JButton backBtn;
     private JTextArea macroReadout = new JTextArea();
     private JScrollPane readoutScroller;
+    private ActionListener gui;
     private final MacroRecorder macroRecorder; {
         try { macroRecorder = new MacroRecorder(macroReadout); }
         catch (NativeHookException e) { throw new RuntimeException(e); }
@@ -29,6 +30,7 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         super(new Color(0x1d1b1e), new Color(0x342d40), GradientPanel.DIAGONAL_FILL);
         this.setPreferredSize(new Dimension(1000, 624));
         this.setLayout(null);
+        this.gui = gui;
 
         JLabel title = new JLabel("Macro Recorder", JLabel.CENTER);
         title.setForeground(new Color(0xcdc2db)); // Secondary
@@ -67,6 +69,7 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         saveBtn.setForeground(new Color(0xcdc2db)); // Tertiary
         saveBtn.setFont(new Font("Century Gothic", Font.BOLD | Font.ITALIC, 24));
         saveBtn.setFocusable(false);
+        saveBtn.addActionListener(this);
 
         backBtn = new JButton("Back");
         backBtn.setContentAreaFilled(false);
@@ -115,6 +118,18 @@ public class MacroPanel extends GradientPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == recBtn) record();
         else if(e.getSource() == stopBtn) stopRecord();
+        else if(e.getSource() == saveBtn) macroRecorder.save();
+        else if(e.getSource() == backBtn) back();
+    }
+
+    public void back() {
+        ActionEvent event = new ActionEvent(backBtn, 69, "Back");
+        macroRecorder.clearFile();
+        backBtn.removeActionListener(gui);
+        backBtn.addActionListener(this);
+        backBtn.getActionListeners()[0].actionPerformed(event);
+        backBtn.removeActionListener(gui);
+        backBtn.addActionListener(this);
     }
 
     public void record() {

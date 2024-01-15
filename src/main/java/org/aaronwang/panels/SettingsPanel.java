@@ -226,7 +226,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ActionEvent event = new ActionEvent(backButton, 69, "go back");
+        ActionEvent event = new ActionEvent(backButton, 69, "Back");
 
         // This option pane returns an int. We check to see if that int corresponds to the "yes" option.
         boolean changedSaved = JOptionPane.showConfirmDialog((JFrame) gui, "Would you like to save your changes?", "Note: ", JOptionPane.YES_NO_OPTION) == 0;

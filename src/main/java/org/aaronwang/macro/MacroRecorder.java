@@ -4,7 +4,7 @@ import com.github.kwhat.jnativehook.*;
 import com.github.kwhat.jnativehook.mouse.*;
 import com.github.kwhat.jnativehook.keyboard.*;
 
-import javax.swing.JTextArea;
+import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
@@ -115,19 +115,41 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
     }
 
     public void start() throws NativeHookException, IOException {
-        macroFile = new File("resources/temp-" + System.currentTimeMillis() + ".txt");
+        macroFile = new File("temp/temp-" + System.currentTimeMillis() + ".txt");
         if (macroFile.createNewFile()) writer = new BufferedWriter(new FileWriter(macroFile));
-
-
         isRecording = true;
 
     }
-
     public void close() throws NativeHookException, IOException {
         for(String s : temp) writer.write(s + "\n");
         writer.close();
         temp.clear();
-
         isRecording = false;
+    }
+
+    public void clearFile() {
+        macroFile = null;
+    }
+    public void save() {
+        if(macroFile == null) {
+            JOptionPane.showMessageDialog(null, "You have nothing recorded!", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        int userChoice = fileChooser.showSaveDialog(output.getParent().getParent().getParent());
+        if(userChoice != JFileChooser.APPROVE_OPTION) return;
+
+        File destination = (fileChooser.getSelectedFile().getAbsolutePath().endsWith(".micromacro"))
+                           ? new File(fileChooser.getSelectedFile().getAbsolutePath())
+                           : new File(fileChooser.getSelectedFile().getAbsolutePath() + ".micromacro");
+
+        if(!macroFile.renameTo(destination)) {
+            JOptionPane.showMessageDialog(null, "The file was not saved!", "Error!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JOptionPane.showMessageDialog(null, "Your file was saved.", "Note!", JOptionPane.INFORMATION_MESSAGE);
+
     }
 }
