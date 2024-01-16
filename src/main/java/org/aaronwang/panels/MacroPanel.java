@@ -10,11 +10,12 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class MacroPanel extends GradientPanel implements ActionListener {
+public class MacroPanel extends GradientPanel implements ActionListener, KeyListener {
     private JButton loadPlayBtn;
     private JButton recBtn;
     private JButton stopBtn;
@@ -23,6 +24,7 @@ public class MacroPanel extends GradientPanel implements ActionListener {
     private JTextArea macroReadout = new JTextArea();
     private JScrollPane readoutScroller;
     private ActionListener gui;
+    private JFrame frame;
     private final MacroRecorder macroRecorder; {
         try { macroRecorder = new MacroRecorder(macroReadout); }
         catch (NativeHookException e) { throw new RuntimeException(e); }
@@ -36,6 +38,7 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         this.setPreferredSize(new Dimension(1000, 624));
         this.setLayout(null);
         this.gui = gui;
+        this.frame = (JFrame) gui;
 
         JLabel title = new JLabel("Macro Recorder", JLabel.CENTER);
         title.setForeground(new Color(0xcdc2db)); // Secondary
@@ -194,18 +197,25 @@ public class MacroPanel extends GradientPanel implements ActionListener {
     private void playFile() throws IOException {
         try {
             macroPlayer = new MacroPlayer(loadedFile);
-        } catch (FileNotFoundException | AWTException e) {
+        } catch (AWTException e) {
             JOptionPane.showMessageDialog(this.getParent(), "Something went wrong!!!!!! aaaaaaa", "help me", JOptionPane.ERROR_MESSAGE);
         }
-        int loopPlaybackChoice = JOptionPane.showConfirmDialog(this.getParent(), "Loop macro playback?", "Note!", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        int loopPlaybackChoice = JOptionPane.showConfirmDialog(this.getParent(), "Loop macro playback?", "Note!", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        if(loopPlaybackChoice == 2 || loopPlaybackChoice == -1) return;
         if(loopPlaybackChoice == 0) loopPlayback = true;
 
         backBtn.setEnabled(false);
         loadPlayBtn.setEnabled(false);
         recBtn.setEnabled(false);
+        saveBtn.setEnabled(false);
+
         stopBtn.setEnabled(true);
         stopBtn.setText("Stop Playback");
-        saveBtn.setEnabled(false);
+        stopBtn.addActionListener(this);
+        stopBtn.setFocusable(true);
+
+        frame.repaint();
+        this.repaint();
 
         if(loopPlayback) {
             while(loopPlayback) {
@@ -221,5 +231,19 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         stopBtn.setEnabled(false);
         stopBtn.setText("Stop Recording");
         saveBtn.setEnabled(true);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 }

@@ -13,14 +13,16 @@ public class MacroPlayer {
     int curLine = 1;
     boolean shouldStopPlayback = false;
     File fileToPlay;
+    boolean isClosed = false;
     public MacroPlayer(File file) throws FileNotFoundException, AWTException {
         this.fileToPlay = file;
         br = new BufferedReader(new FileReader(fileToPlay));
         robot = new Robot();
     }
     public void playFile() throws IOException {
-        if(br == null) {
+        if(isClosed) {
             br = new BufferedReader(new FileReader(fileToPlay));
+            isClosed = false;
         }
         if(!validateScale()) return;
         String temp = "";
@@ -38,6 +40,7 @@ public class MacroPlayer {
         }
         // Returns true if entire playback has finished.
         br.close();
+        isClosed = true;
     }
 
     private boolean validateScale() throws IOException {

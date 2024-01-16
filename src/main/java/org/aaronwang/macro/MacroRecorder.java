@@ -171,8 +171,4 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
         JOptionPane.showMessageDialog(null, "Your file was saved.", "Note!", JOptionPane.INFORMATION_MESSAGE);
 
     }
-
-    public File getTempFile() {
-        return macroFile;
-    }
 }
