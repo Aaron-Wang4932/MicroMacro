@@ -2,6 +2,7 @@ package org.aaronwang.panels;
 
 import com.github.kwhat.jnativehook.NativeHookException;
 import org.aaronwang.UI.GradientPanel;
+import org.aaronwang.macro.MacroPlayer;
 import org.aaronwang.macro.MacroRecorder;
 
 import javax.swing.*;
@@ -9,6 +10,8 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class MacroPanel extends GradientPanel implements ActionListener {
@@ -23,8 +26,10 @@ public class MacroPanel extends GradientPanel implements ActionListener {
     private final MacroRecorder macroRecorder; {
         try { macroRecorder = new MacroRecorder(macroReadout); }
         catch (NativeHookException e) { throw new RuntimeException(e); }
-
     }
+    private MacroPlayer macroPlayer;
+    private File loadedFile;
+    private boolean loopPlayback = false;
 
     public MacroPanel(ActionListener gui) {
         super(new Color(0x1d1b1e), new Color(0x342d40), GradientPanel.DIAGONAL_FILL);
@@ -48,6 +53,7 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         loadPlayBtn.setForeground(new Color(0xcdc2db)); // Tertiary
         loadPlayBtn.setFont(new Font("Century Gothic", Font.BOLD | Font.ITALIC, 24));
         loadPlayBtn.setFocusable(false);
+        loadPlayBtn.addActionListener(this);
 
         recBtn = new JButton("Record File");
         recBtn.setContentAreaFilled(false);
@@ -76,7 +82,7 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         backBtn.setForeground(new Color(0xcdc2db));
         backBtn.setFont(new Font("Century Gothic", Font.BOLD | Font.ITALIC, 24));
         backBtn.setFocusable(false);
-        backBtn.addActionListener(gui);
+        backBtn.addActionListener(this);
 
         macroReadout.setMargin(new Insets(10, 10, 10, 10));
         macroReadout.setLineWrap(true);
@@ -120,19 +126,31 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         else if(e.getSource() == stopBtn) stopRecord();
         else if(e.getSource() == saveBtn) macroRecorder.save();
         else if(e.getSource() == backBtn) back();
+        else if(e.getSource() == loadPlayBtn && loadPlayBtn.getText().equals("Load File")) loadFile();
+        else if(e.getSource() == loadPlayBtn && loadPlayBtn.getText().equals("Play File")) {
+            try {
+                playFile();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
-    public void back() {
+    private void back() {
+
         ActionEvent event = new ActionEvent(backBtn, 69, "Back");
         macroRecorder.clearFile();
-        backBtn.removeActionListener(gui);
-        backBtn.addActionListener(this);
+
+        backBtn.removeActionListener(this);
+        backBtn.addActionListener(gui);
         backBtn.getActionListeners()[0].actionPerformed(event);
         backBtn.removeActionListener(gui);
         backBtn.addActionListener(this);
+
+        loadPlayBtn.setText("Load File");
     }
 
-    public void record() {
+    private void record() {
         try {
             macroRecorder.start();
         } catch (NativeHookException | IOException e) {
@@ -141,10 +159,12 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         recBtn.setEnabled(false);
         stopBtn.setEnabled(true);
         backBtn.setEnabled(false);
-        macroReadout.setText("");
+        saveBtn.setEnabled(false);
+        loadPlayBtn.setEnabled(false);
+
     }
 
-    public void stopRecord() {
+    private void stopRecord() {
         try {
             macroRecorder.close();
         } catch (NativeHookException | IOException e) {
@@ -153,5 +173,53 @@ public class MacroPanel extends GradientPanel implements ActionListener {
         recBtn.setEnabled(true);
         stopBtn.setEnabled(false);
         backBtn.setEnabled(true);
+        saveBtn.setEnabled(true);
+        loadPlayBtn.setEnabled(true);
+    }
+
+    private void loadFile() {
+        JFileChooser jfc = new JFileChooser();
+        int userChoice = jfc.showOpenDialog(this.getParent());
+        if(userChoice != JFileChooser.APPROVE_OPTION) return;
+
+        loadedFile = jfc.getSelectedFile();
+        if(!loadedFile.getAbsolutePath().endsWith(".micromacro")) {
+            JOptionPane.showMessageDialog(this.getParent(), "Please ensure your file has the .micromacro extension.", "Warning!", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        loadPlayBtn.setText("Play File");
+    }
+
+    private void playFile() throws IOException {
+        try {
+            macroPlayer = new MacroPlayer(loadedFile);
+        } catch (FileNotFoundException | AWTException e) {
+            JOptionPane.showMessageDialog(this.getParent(), "Something went wrong!!!!!! aaaaaaa", "help me", JOptionPane.ERROR_MESSAGE);
+        }
+        int loopPlaybackChoice = JOptionPane.showConfirmDialog(this.getParent(), "Loop macro playback?", "Note!", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        if(loopPlaybackChoice == 0) loopPlayback = true;
+
+        backBtn.setEnabled(false);
+        loadPlayBtn.setEnabled(false);
+        recBtn.setEnabled(false);
+        stopBtn.setEnabled(true);
+        stopBtn.setText("Stop Playback");
+        saveBtn.setEnabled(false);
+
+        if(loopPlayback) {
+            while(loopPlayback) {
+                macroPlayer.playFile();
+            }
+        } else {
+            macroPlayer.playFile();
+        }
+
+        backBtn.setEnabled(true);
+        loadPlayBtn.setEnabled(true);
+        recBtn.setEnabled(true);
+        stopBtn.setEnabled(false);
+        stopBtn.setText("Stop Recording");
+        saveBtn.setEnabled(true);
     }
 }

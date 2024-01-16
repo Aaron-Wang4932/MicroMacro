@@ -10,16 +10,21 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionListener, NativeMouseWheelListener, NativeMouseInputListener, NativeKeyListener {
+    // Gets screen pixels, accounting for system scaling
     private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+    // Get the scale factor --> 100% scaling is 96.0 DPI
     private final double scaleFactor = Toolkit.getDefaultToolkit().getScreenResolution() / 96.0;
+    // Calculate the screen's X and Y based on scaling info - for Robot's usage.
     private final int screenX = (int)(Math.ceil(screen.width * scaleFactor));
     private final int screenY = (int)(Math.ceil(screen.height * scaleFactor));
+    // Get system time to determine timings between input
     private long clock = System.currentTimeMillis();
     private BufferedWriter writer;
-    private File macroFile;
-    private ArrayList<String> temp = new ArrayList<>();
+    private File macroFile = null;
+    // Temporarily store all inputs in ArrayList
+    private final ArrayList<String> temp = new ArrayList<>();
     private boolean isRecording;
-    private JTextArea output;
+    private final JTextArea output;
     public MacroRecorder(JTextArea output) throws NativeHookException {
         GlobalScreen.registerNativeHook();
         GlobalScreen.addNativeMouseMotionListener(this);
@@ -115,12 +120,25 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
     }
 
     public void start() throws NativeHookException, IOException {
-        macroFile = new File("temp/temp-" + System.currentTimeMillis() + ".txt");
-        if (macroFile.createNewFile()) writer = new BufferedWriter(new FileWriter(macroFile));
-        isRecording = true;
+        // Temporary files get saved to this location.
+        File macroFileDirectory = new File(new JFileChooser().getFileSystemView().getDefaultDirectory().getAbsolutePath() + "/MicroMacroTemp");
+        // Create directory if it does not already exist.
+        macroFileDirectory.mkdirs();
+        // Instantiate the macro file
+        macroFile = new File(macroFileDirectory.getAbsolutePath() + "\\temp-" + System.currentTimeMillis() + ".micromacro");
+        // If the file was created, all listeners will become active.
+        if (macroFile.createNewFile()) {
+            writer = new BufferedWriter(new FileWriter(macroFile));
+            temp.add("SYSTEM-SCALE-FACTOR " + scaleFactor);
+            clock = System.currentTimeMillis();
+            isRecording = true;
+        } else {
+            JOptionPane.showMessageDialog(null, "An error occurred when recording!", "Error!", JOptionPane.ERROR_MESSAGE);
+        }
 
     }
     public void close() throws NativeHookException, IOException {
+        if(!isRecording) return;
         for(String s : temp) writer.write(s + "\n");
         writer.close();
         temp.clear();
@@ -128,6 +146,7 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
     }
 
     public void clearFile() {
+        output.setText("");
         macroFile = null;
     }
     public void save() {
@@ -151,5 +170,9 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
 
         JOptionPane.showMessageDialog(null, "Your file was saved.", "Note!", JOptionPane.INFORMATION_MESSAGE);
 
+    }
+
+    public File getTempFile() {
+        return macroFile;
     }
 }

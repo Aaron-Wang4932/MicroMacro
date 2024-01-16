@@ -1,7 +1,5 @@
 package org.aaronwang;
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.util.Set;
+import org.aaronwang.macro.MacroPlayer;
 
 public class Main {
     public static void main(String[] args) {
