@@ -195,15 +195,6 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
     }
 
     private void playFile() throws IOException {
-        try {
-            macroPlayer = new MacroPlayer(loadedFile);
-        } catch (AWTException e) {
-            JOptionPane.showMessageDialog(this.getParent(), "Something went wrong!!!!!! aaaaaaa", "help me", JOptionPane.ERROR_MESSAGE);
-        }
-        int loopPlaybackChoice = JOptionPane.showConfirmDialog(this.getParent(), "Loop macro playback?", "Note!", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-        if(loopPlaybackChoice == 2 || loopPlaybackChoice == -1) return;
-        if(loopPlaybackChoice == 0) loopPlayback = true;
-
         backBtn.setEnabled(false);
         loadPlayBtn.setEnabled(false);
         recBtn.setEnabled(false);
@@ -214,16 +205,21 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
         stopBtn.addActionListener(this);
         stopBtn.setFocusable(true);
 
-        frame.repaint();
-        this.repaint();
 
-        if(loopPlayback) {
-            while(loopPlayback) {
-                macroPlayer.playFile();
-            }
-        } else {
-            macroPlayer.playFile();
+        try {
+            macroPlayer = new MacroPlayer(loadedFile);
+        } catch (AWTException e) {
+            JOptionPane.showMessageDialog(this.getParent(), "Something went wrong!!!!!! aaaaaaa", "help me", JOptionPane.ERROR_MESSAGE);
         }
+        int loopPlaybackChoice = JOptionPane.showConfirmDialog(this.getParent(), "Loop macro playback?", "Note!", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        if(loopPlaybackChoice == 2 || loopPlaybackChoice == -1) {
+            return;
+        }
+        if(loopPlaybackChoice == 0) loopPlayback = true;
+
+        if(loopPlayback) while(loopPlayback) macroPlayer.playFile();
+        else macroPlayer.playFile();
+
 
         backBtn.setEnabled(true);
         loadPlayBtn.setEnabled(true);
