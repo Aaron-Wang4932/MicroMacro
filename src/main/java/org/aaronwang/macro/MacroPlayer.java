@@ -1,11 +1,12 @@
 package org.aaronwang.macro;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import java.awt.event.InputEvent;
 import java.io.*;
 import java.awt.*;
 
-public class MacroPlayer {
+public class MacroPlayer extends JPanel {
     // Get the scale factor --> 100% scaling is 96.0 DPI
     private final double scaleFactor = Toolkit.getDefaultToolkit().getScreenResolution() / 96.0;
     BufferedReader br;
@@ -25,7 +26,7 @@ public class MacroPlayer {
             isClosed = false;
         }
         if(!validateScale()) return;
-        String temp = "";
+        String temp;
         while(!shouldStopPlayback && ((temp = br.readLine()) != null)) {
             curLine++;
 
@@ -84,7 +85,7 @@ public class MacroPlayer {
 
     private void pressKey(String s) {
         String cmd = s.replace("PRESS_K ", "");
-        int keyCode = 0;
+        int keyCode;
         try {
             keyCode = Integer.parseInt(cmd);
         } catch (NumberFormatException nfe) {
@@ -99,7 +100,7 @@ public class MacroPlayer {
     }
     private void releaseKey(String s) {
         String cmd = s.replace("RELEASE_K ", "");
-        int keyCode = 0;
+        int keyCode;
         try {
             keyCode = Integer.parseInt(cmd);
         } catch (NumberFormatException nfe) {
@@ -114,20 +115,15 @@ public class MacroPlayer {
     }
     private void pressMouse(String s) {
         String cmd = s.replace("PRESS_M ", "");
-        int mouseCode = 0;
+        int mouseCode;
         try {
             mouseCode = Integer.parseInt(cmd);
-            switch(mouseCode) {
-                case 1:
-                    mouseCode = InputEvent.BUTTON1_DOWN_MASK;
-                    break;
-                case 2:
-                    mouseCode = InputEvent.BUTTON2_DOWN_MASK;
-                    break;
-                case 3:
-                    mouseCode = InputEvent.BUTTON3_DOWN_MASK;
-                    break;
-            }
+            mouseCode = switch (mouseCode) {
+                case 1 -> InputEvent.BUTTON1_DOWN_MASK;
+                case 2 -> InputEvent.BUTTON2_DOWN_MASK;
+                case 3 -> InputEvent.BUTTON3_DOWN_MASK;
+                default -> mouseCode;
+            };
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null,
                     "Invalid mousecode on line " + curLine + ". Playback will cease.",
@@ -140,20 +136,15 @@ public class MacroPlayer {
     }
     private void releaseMouse(String s) {
         String cmd = s.replace("RELEASE_M ", "");
-        int mouseCode = 0;
+        int mouseCode;
         try {
             mouseCode = Integer.parseInt(cmd);
-            switch(mouseCode) {
-                case 1:
-                    mouseCode = InputEvent.BUTTON1_DOWN_MASK;
-                    break;
-                case 2:
-                    mouseCode = InputEvent.BUTTON2_DOWN_MASK;
-                    break;
-                case 3:
-                    mouseCode = InputEvent.BUTTON3_DOWN_MASK;
-                    break;
-            }
+            mouseCode = switch (mouseCode) {
+                case 1 -> InputEvent.BUTTON1_DOWN_MASK;
+                case 2 -> InputEvent.BUTTON2_DOWN_MASK;
+                case 3 -> InputEvent.BUTTON3_DOWN_MASK;
+                default -> mouseCode;
+            };
         } catch (NumberFormatException nfe) {
             JOptionPane.showMessageDialog(null,
                     "Invalid mousecode on line " + curLine + ". Playback will cease.",
@@ -184,7 +175,7 @@ public class MacroPlayer {
     }
     private void scrollMouse(String s) {
         String cmd = s.replace("SCROLL ", "");
-        int scrollAmt = 0;
+        int scrollAmt;
         try {
             scrollAmt = Integer.parseInt(cmd);
         } catch (NumberFormatException nfe) {
@@ -199,7 +190,7 @@ public class MacroPlayer {
     }
     private void pause(String s) {
         String cmd = s.replace("WAIT ", "");
-        int waitTimeMS = 0;
+        int waitTimeMS;
         try {
             waitTimeMS = Integer.parseInt(cmd);
         } catch (NumberFormatException nfe) {
@@ -211,6 +202,10 @@ public class MacroPlayer {
             return;
         }
         robot.delay(waitTimeMS);
+    }
+
+    public void sendHelp() {
+        shouldStopPlayback = true;
     }
 
 }

@@ -12,10 +12,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
-public class MacroPanel extends GradientPanel implements ActionListener, KeyListener {
+public class MacroPanel extends GradientPanel implements ActionListener, KeyListener{
     private JButton loadPlayBtn;
     private JButton recBtn;
     private JButton stopBtn;
@@ -25,10 +27,19 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
     private JScrollPane readoutScroller;
     private ActionListener gui;
     private JFrame frame;
-    private final MacroRecorder macroRecorder; {
-        try { macroRecorder = new MacroRecorder(macroReadout); }
-        catch (NativeHookException e) { throw new RuntimeException(e); }
+    private final MacroRecorder macroRecorder;
+    private static int delay;
+    private static int[] keybinds = new int[2];
+    private int[] potentialKeybindsIDK = new int[2];
+
+    {
+        try {
+            macroRecorder = new MacroRecorder(macroReadout);
+        } catch (NativeHookException e) {
+            throw new RuntimeException(e);
+        }
     }
+
     private MacroPlayer macroPlayer;
     private File loadedFile;
     private boolean loopPlayback = false;
@@ -119,18 +130,38 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
         backBtn.setBounds(140, 55, 100, 50);
 
         this.add(readoutScroller);
-        readoutScroller.setBounds(390, 178,470, 400);
+        readoutScroller.setBounds(390, 178, 470, 400);
+
+
+        try {
+            setStuff();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == recBtn) record();
-        else if(e.getSource() == stopBtn) stopRecord();
-        else if(e.getSource() == saveBtn) macroRecorder.save();
-        else if(e.getSource() == backBtn) back();
-        else if(e.getSource() == loadPlayBtn && loadPlayBtn.getText().equals("Load File")) loadFile();
-        else if(e.getSource() == loadPlayBtn && loadPlayBtn.getText().equals("Play File")) {
+        if (e.getSource() == recBtn) {
+            macroReadout.setText(delay + " ms delay.");
+            recBtn.setEnabled(false);
+            backBtn.setEnabled(false);
+            saveBtn.setEnabled(false);
+            loadPlayBtn.setEnabled(false);
+            Timer delayTimer = new Timer(delay, e1 -> {
+                record();
+                macroReadout.setText("Delay done!");
+                stopBtn.setEnabled(true);
+            });
+            delayTimer.setRepeats(false);
+            delayTimer.start();
+        }
+        else if (e.getSource() == stopBtn) stopRecord();
+        else if (e.getSource() == saveBtn) macroRecorder.save();
+        else if (e.getSource() == backBtn) back();
+        else if (e.getSource() == loadPlayBtn && loadPlayBtn.getText().equals("Load File")) loadFile();
+        else if (e.getSource() == loadPlayBtn && loadPlayBtn.getText().equals("Play File")) {
             try {
                 playFile();
             } catch (IOException ex) {
@@ -159,12 +190,6 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
         } catch (NativeHookException | IOException e) {
             throw new RuntimeException(e);
         }
-        recBtn.setEnabled(false);
-        stopBtn.setEnabled(true);
-        backBtn.setEnabled(false);
-        saveBtn.setEnabled(false);
-        loadPlayBtn.setEnabled(false);
-
     }
 
     private void stopRecord() {
@@ -183,10 +208,10 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
     private void loadFile() {
         JFileChooser jfc = new JFileChooser();
         int userChoice = jfc.showOpenDialog(this.getParent());
-        if(userChoice != JFileChooser.APPROVE_OPTION) return;
+        if (userChoice != JFileChooser.APPROVE_OPTION) return;
 
         loadedFile = jfc.getSelectedFile();
-        if(!loadedFile.getAbsolutePath().endsWith(".micromacro")) {
+        if (!loadedFile.getAbsolutePath().endsWith(".micromacro")) {
             JOptionPane.showMessageDialog(this.getParent(), "Please ensure your file has the .micromacro extension.", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -208,16 +233,25 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
 
         try {
             macroPlayer = new MacroPlayer(loadedFile);
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner().addKeyListener(this);
+
         } catch (AWTException e) {
             JOptionPane.showMessageDialog(this.getParent(), "Something went wrong!!!!!! aaaaaaa", "help me", JOptionPane.ERROR_MESSAGE);
         }
         int loopPlaybackChoice = JOptionPane.showConfirmDialog(this.getParent(), "Loop macro playback?", "Note!", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-        if(loopPlaybackChoice == 2 || loopPlaybackChoice == -1) {
+        if (loopPlaybackChoice == 2 || loopPlaybackChoice == -1) {
+            backBtn.setEnabled(true);
+            loadPlayBtn.setEnabled(true);
+            recBtn.setEnabled(true);
+            stopBtn.setEnabled(false);
+            stopBtn.setText("Stop Recording");
+            saveBtn.setEnabled(true);
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner().removeKeyListener(this);
             return;
         }
-        if(loopPlaybackChoice == 0) loopPlayback = true;
+        if (loopPlaybackChoice == 0) loopPlayback = true;
 
-        if(loopPlayback) while(loopPlayback) macroPlayer.playFile();
+        if (loopPlayback) while (loopPlayback) macroPlayer.playFile();
         else macroPlayer.playFile();
 
 
@@ -229,6 +263,18 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
         saveBtn.setEnabled(true);
     }
 
+    public static void setStuff() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("resources/config.txt"));
+        String temp = br.readLine();
+        temp = temp.replace("recording-delay: ", "");
+        delay = Integer.parseInt(temp);
+
+        temp = br.readLine();
+        temp = temp.replace("pref-keybind: ", "");
+        keybinds[0] = Integer.parseInt(temp.split(", ")[0]);
+        keybinds[1] = Integer.parseInt(temp.split(", ")[1]);
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -236,10 +282,24 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == keybinds[0]) potentialKeybindsIDK[0] = e.getKeyCode();
+
+        if(keybinds[1] == e.getKeyCode()) potentialKeybindsIDK[1] = e.getKeyCode();
+
+        if(keybinds[0] == potentialKeybindsIDK[0]
+                && keybinds[1] == potentialKeybindsIDK[1]
+                && recBtn.isEnabled()) {
+            recBtn.getActionListeners()[0].actionPerformed(new ActionEvent(recBtn, 69, "Record File"));
+        } else if (keybinds[0] == potentialKeybindsIDK[0]
+                && keybinds[1] == potentialKeybindsIDK[1]
+                && !recBtn.isEnabled()
+                && stopBtn.isEnabled()) stopRecord();
+
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        potentialKeybindsIDK[0] = 0;
+        potentialKeybindsIDK[1] = 0;
     }
 }

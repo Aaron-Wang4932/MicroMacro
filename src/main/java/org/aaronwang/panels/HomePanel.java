@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 public class HomePanel extends GradientPanel {
     public HomePanel(ActionListener gui) {
         super(new Color(0x1d1b1e), new Color(0x3d137f), GradientPanel.VERTICAL_FILL); // Base background, on primary
-        this.setPreferredSize(new Dimension(1000, 624));
+        this.setPreferredSize(new Dimension(700, 500));
         this.setLayout(null);
 
         JLabel title = new JLabel("MicroMacro", JLabel.CENTER);
@@ -44,13 +44,11 @@ public class HomePanel extends GradientPanel {
         settings.addActionListener(gui);
 
         this.add(title);
-        title.setBounds(284, 20, 432, 132);
+        title.setBounds(134, 20, 432, 132);
         this.add(macroRecorder);
-        macroRecorder.setBounds(300, 232, 400, 64);
-        this.add(autoClicker);
-        autoClicker.setBounds(300, 356, 400, 64);
+        macroRecorder.setBounds(150, 232, 400, 64);
         this.add(settings);
-        settings.setBounds(300, 480, 400, 64);
+        settings.setBounds(150, 356, 400, 64);
     }
 
 }
