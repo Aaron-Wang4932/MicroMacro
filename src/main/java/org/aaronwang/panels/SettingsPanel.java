@@ -200,7 +200,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
         if(KeyEvent.getKeyText(e.getKeyCode()).equals("Escape")) {
             this.requestFocus();
         }
-        // If structure disallows duplicate key presses to be counted as keybinds.
+        // Logic structure disallows duplicate key presses to be counted as keybinds.
         // If the current received keycode is the last entry in the ArrayList,
         // The logic is not entered.
         if(enteredKeybinds.get(enteredKeybinds.size() - 1) != e.getKeyCode()) {
@@ -232,6 +232,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
         boolean changedSaved = JOptionPane.showConfirmDialog((JFrame) gui, "Would you like to save your changes?", "Note: ", JOptionPane.YES_NO_OPTION) == 0;
 
         if(!changedSaved) {
+            // If going back to the previous panel, reset and change all inputs so that they will match with what was written.
             backButton.removeActionListener(this);
             backButton.addActionListener(gui);
             backButton.getActionListeners()[0].actionPerformed(event);

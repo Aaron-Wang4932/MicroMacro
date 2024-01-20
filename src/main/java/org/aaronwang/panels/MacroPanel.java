@@ -42,7 +42,6 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
 
     private MacroPlayer macroPlayer;
     private File loadedFile;
-    private boolean loopPlayback = false;
 
     public MacroPanel(ActionListener gui) {
         super(new Color(0x1d1b1e), new Color(0x342d40), GradientPanel.DIAGONAL_FILL);
@@ -134,6 +133,7 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
 
 
         try {
+            // Loads in settings
             setStuff();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -149,6 +149,7 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
             backBtn.setEnabled(false);
             saveBtn.setEnabled(false);
             loadPlayBtn.setEnabled(false);
+
             Timer delayTimer = new Timer(delay, e1 -> {
                 record();
                 macroReadout.setText("Delay done!");
@@ -171,7 +172,6 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
     }
 
     private void back() {
-
         ActionEvent event = new ActionEvent(backBtn, 69, "Back");
         macroRecorder.clearFile();
 
@@ -206,12 +206,15 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
     }
 
     private void loadFile() {
+        // Gain access to the file the user specifies
         JFileChooser jfc = new JFileChooser();
         int userChoice = jfc.showOpenDialog(this.getParent());
         if (userChoice != JFileChooser.APPROVE_OPTION) return;
 
         loadedFile = jfc.getSelectedFile();
         if (!loadedFile.getAbsolutePath().endsWith(".micromacro")) {
+            // Ensure the file has the valid file extension
+            // Further file verification will proceed if the user has erroneously uploaded another file renamed to .micromacro.
             JOptionPane.showMessageDialog(this.getParent(), "Please ensure your file has the .micromacro extension.", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -237,6 +240,8 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
 
         boolean entryIsNum = false;
         int numLoops = -1;
+
+        // Prompt the user to enter the number of times to loop the file, re-prompting whenever there is an invalid entry.
         String input = JOptionPane.showInputDialog(this, "Please enter the number of times to run this macro.", "Entry Required: ", JOptionPane.QUESTION_MESSAGE);
         while(!entryIsNum) {
             if(input == null) {
@@ -272,6 +277,7 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
     }
 
     public static void setStuff() throws IOException {
+        // Read file and load in settings.
         BufferedReader br = new BufferedReader(new FileReader("resources/config.txt"));
         String temp = br.readLine();
         temp = temp.replace("recording-delay: ", "");
@@ -285,11 +291,17 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
 
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        /*
+        * If the first key of a keybind is pressed, add that to the ArrayList.
+        * If the second key is pressed whilst the first key is held, add the second key to the ArrayList.
+        * If the keybinds match up to that of the settings, either record or stop recording depending on the current state of the button.
+
+        * Keybinds are cleared when keys are released.
+        * */
         if(e.getKeyCode() == keybinds[0]) potentialKeybindsIDK[0] = e.getKeyCode();
 
         if(keybinds[1] == e.getKeyCode()) potentialKeybindsIDK[1] = e.getKeyCode();

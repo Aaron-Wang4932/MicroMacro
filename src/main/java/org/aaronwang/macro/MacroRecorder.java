@@ -1,12 +1,30 @@
 package org.aaronwang.macro;
 
-import com.github.kwhat.jnativehook.*;
-import com.github.kwhat.jnativehook.mouse.*;
-import com.github.kwhat.jnativehook.keyboard.*;
+import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.NativeHookException;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
+import com.github.kwhat.jnativehook.keyboard.SwingKeyAdapter;
+
+import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
+import com.github.kwhat.jnativehook.mouse.NativeMouseInputListener;
+import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
+import com.github.kwhat.jnativehook.mouse.NativeMouseWheelEvent;
+import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import java.util.ArrayList;
 
 public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionListener, NativeMouseWheelListener, NativeMouseInputListener, NativeKeyListener {
@@ -26,6 +44,7 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
     private boolean isRecording;
     private final JTextArea output;
     public MacroRecorder(JTextArea output) throws NativeHookException {
+        // Register all listeners
         GlobalScreen.registerNativeHook();
         GlobalScreen.addNativeMouseMotionListener(this);
         GlobalScreen.addNativeMouseListener(this);
@@ -34,6 +53,7 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
         this.output = output;
     }
     @Override
+    // On each input, write to file the corresponding input type and its value.
     public void nativeKeyPressed(NativeKeyEvent e) {
         if(!isRecording) return;
         if(getJavaKeyEvent(e).getKeyCode() == 20) return; // Disallow Caps Lock key due to unpredictable behaviour
@@ -110,6 +130,7 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
         temp.add("SCROLL " + e.getWheelRotation());
     }
 
+    // Calculate the interval between inputs by finding the difference between then and now.
     private void calcInterval() {
         long time = System.currentTimeMillis() - clock;
         if(output.getText().isEmpty()) output.setText("WAIT " + time);
@@ -138,6 +159,7 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
 
     }
     public void close() throws NativeHookException, IOException {
+        // End off everything and reset to default values.
         if(!isRecording) return;
         for(String s : temp) writer.write(s + "\n");
         writer.close();
@@ -150,24 +172,29 @@ public class MacroRecorder extends SwingKeyAdapter implements NativeMouseMotionL
         macroFile = null;
     }
     public void save() {
+        // If the file object has not yet been instantiated, it means that nothing has been logged and written, and thus, nothing can be saved.
         if(macroFile == null) {
             JOptionPane.showMessageDialog(null, "You have nothing recorded!", "Warning!", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
+        // Allow the user to choose where to save the file.
         JFileChooser fileChooser = new JFileChooser();
         int userChoice = fileChooser.showSaveDialog(output.getParent().getParent().getParent());
         if(userChoice != JFileChooser.APPROVE_OPTION) return;
 
+        // Create a new file object corresponding to the desired destination. Ternary operator ensures that the file extension is always .micromacro.
         File destination = (fileChooser.getSelectedFile().getAbsolutePath().endsWith(".micromacro"))
                            ? new File(fileChooser.getSelectedFile().getAbsolutePath())
                            : new File(fileChooser.getSelectedFile().getAbsolutePath() + ".micromacro");
 
+        // Rename and move the temporary macroFile to the new destination.
         if(!macroFile.renameTo(destination)) {
             JOptionPane.showMessageDialog(null, "The file was not saved!", "Error!", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        // User confirmation.
         JOptionPane.showMessageDialog(null, "Your file was saved.", "Note!", JOptionPane.INFORMATION_MESSAGE);
 
     }

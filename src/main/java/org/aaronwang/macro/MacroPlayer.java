@@ -40,9 +40,11 @@ public class MacroPlayer extends JPanel {
         // If improper scaling information is found and the user does not wish to proceed:
         if(!validateScale()) return;
         String temp;
+
+        // Continuously validate each new command, whilst ensuring that we have not yet reached the end of the file.
         while(!shouldStopPlayback && ((temp = br.readLine()) != null)) {
             curLine++;
-
+            // Execute specified inputs.
             if(temp.startsWith("PRESS_K ")) pressKey(temp);
             else if (temp.startsWith("RELEASE_K ")) releaseKey(temp);
             else if (temp.startsWith("PRESS_M ")) pressMouse(temp);
@@ -52,7 +54,6 @@ public class MacroPlayer extends JPanel {
             else if (temp.startsWith("WAIT ")) pause(temp);
 
         }
-        // Returns true if entire playback has finished.
         br.close();
         isClosed = true;
     }
@@ -99,8 +100,11 @@ public class MacroPlayer extends JPanel {
     }
 
     private void pressKey(String s) {
+        // Get the command and parse it, stripping away identifier.
         String cmd = s.replace("PRESS_K ", "");
         int keyCode;
+        // Try to parse the integer as a valid keycode.
+        // If error, let the user know which line is invalid, then stop playback.
         try {
             keyCode = Integer.parseInt(cmd);
         } catch (NumberFormatException nfe) {
@@ -218,9 +222,4 @@ public class MacroPlayer extends JPanel {
         }
         robot.delay(waitTimeMS);
     }
-
-    public void sendHelp() {
-        shouldStopPlayback = true;
-    }
-
 }

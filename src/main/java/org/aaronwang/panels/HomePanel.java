@@ -1,13 +1,19 @@
 package org.aaronwang.panels;
 
-import org.aaronwang.UI.*;
+import org.aaronwang.UI.GradientPanel;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
-import java.awt.*;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionListener;
 public class HomePanel extends GradientPanel {
     public HomePanel(ActionListener gui) {
+        // All below code is in regard to settings and appearances.
         super(new Color(0x1d1b1e), new Color(0x3d137f), GradientPanel.VERTICAL_FILL); // Base background, on primary
         this.setPreferredSize(new Dimension(700, 500));
         this.setLayout(null);
