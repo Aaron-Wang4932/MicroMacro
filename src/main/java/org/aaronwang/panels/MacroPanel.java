@@ -229,30 +229,38 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
         stopBtn.setText("Stop Playback");
         stopBtn.addActionListener(this);
         stopBtn.setFocusable(true);
-
-
         try {
             macroPlayer = new MacroPlayer(loadedFile);
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner().addKeyListener(this);
-
         } catch (AWTException e) {
             JOptionPane.showMessageDialog(this.getParent(), "Something went wrong!!!!!! aaaaaaa", "help me", JOptionPane.ERROR_MESSAGE);
         }
-        int loopPlaybackChoice = JOptionPane.showConfirmDialog(this.getParent(), "Loop macro playback?", "Note!", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-        if (loopPlaybackChoice == 2 || loopPlaybackChoice == -1) {
-            backBtn.setEnabled(true);
-            loadPlayBtn.setEnabled(true);
-            recBtn.setEnabled(true);
-            stopBtn.setEnabled(false);
-            stopBtn.setText("Stop Recording");
-            saveBtn.setEnabled(true);
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner().removeKeyListener(this);
-            return;
-        }
-        if (loopPlaybackChoice == 0) loopPlayback = true;
 
-        if (loopPlayback) while (loopPlayback) macroPlayer.playFile();
-        else macroPlayer.playFile();
+        boolean entryIsNum = false;
+        int numLoops = -1;
+        String input = JOptionPane.showInputDialog(this, "Please enter the number of times to run this macro.", "Entry Required: ", JOptionPane.QUESTION_MESSAGE);
+        while(!entryIsNum) {
+            if(input == null) {
+                backBtn.setEnabled(true);
+                loadPlayBtn.setEnabled(true);
+                recBtn.setEnabled(true);
+                stopBtn.setEnabled(false);
+                stopBtn.setText("Stop Recording");
+                saveBtn.setEnabled(true);
+                return;
+            }
+            try{
+                numLoops = Integer.parseInt(input);
+                if(numLoops < 0) throw new IllegalArgumentException("Invalid number of loops.");
+
+                entryIsNum = true;
+            } catch (NumberFormatException nfe) {
+                input = JOptionPane.showInputDialog(this, "Invalid entry. Please enter the number of times to run this macro.", "Entry Required: ", JOptionPane.QUESTION_MESSAGE);
+            } catch (IllegalArgumentException iae) {
+                input = JOptionPane.showInputDialog(this, "Invalid entry. Please enter a valid number of times to run this macro.", "Entry Required: ", JOptionPane.QUESTION_MESSAGE);
+            }
+        }
+
+        for(int i = 0; i < numLoops; i++) macroPlayer.playFile();
 
 
         backBtn.setEnabled(true);

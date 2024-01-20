@@ -2,9 +2,17 @@ package org.aaronwang.macro;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
-import java.io.*;
-import java.awt.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class MacroPlayer extends JPanel {
     // Get the scale factor --> 100% scaling is 96.0 DPI
@@ -14,17 +22,22 @@ public class MacroPlayer extends JPanel {
     int curLine = 1;
     boolean shouldStopPlayback = false;
     File fileToPlay;
+    // Boolean to track whether the buffered reader is closed, such that it can be reopened in the future.
     boolean isClosed = false;
+    // Each instantiation of MacroPlayer is only suitable to run one file.
+    // Create necessary objects to run the macro file upon instantiation.
     public MacroPlayer(File file) throws FileNotFoundException, AWTException {
         this.fileToPlay = file;
         br = new BufferedReader(new FileReader(fileToPlay));
         robot = new Robot();
     }
     public void playFile() throws IOException {
+        // If the buffered reader is close, instantiate it.
         if(isClosed) {
             br = new BufferedReader(new FileReader(fileToPlay));
             isClosed = false;
         }
+        // If improper scaling information is found and the user does not wish to proceed:
         if(!validateScale()) return;
         String temp;
         while(!shouldStopPlayback && ((temp = br.readLine()) != null)) {
@@ -46,17 +59,18 @@ public class MacroPlayer extends JPanel {
 
     private boolean validateScale() throws IOException {
         String temp;
+        int choice;
         double scale = 0;
         // Read the first line only, which SHOULD be scaling information
         temp = br.readLine();
         // If scaling information is not present:
         if(!temp.contains("SYSTEM-SCALE-FACTOR ")) {
-            int choice = JOptionPane.showConfirmDialog(null,
+            choice = JOptionPane.showConfirmDialog(null,
                     "The loaded file has no system scaling information. Proceed anyway?",
                     "Warning!",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.WARNING_MESSAGE);
-            if(choice != 0) return false;
+            return choice == 0;
         }
 
         temp = temp.replace("SYSTEM-SCALE-FACTOR ", "");
@@ -64,21 +78,22 @@ public class MacroPlayer extends JPanel {
         try {
             scale = Double.parseDouble(temp);
         } catch(NumberFormatException ignored) {
-            int choice = JOptionPane.showConfirmDialog(null,
+            choice = JOptionPane.showConfirmDialog(null,
                     "The system scaling information is invalid. Proceed anyway?",
                     "Warning!",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.WARNING_MESSAGE);
-            if(choice != 0) return false;
+            return choice == 0;
+        }
 
-            if(scale != scaleFactor) {
-                int choice2 = JOptionPane.showConfirmDialog(null,
-                        "The recorded scale factor of " + scale + " does not match the current scale factor. Proceed anyway?",
-                        "Warning!",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE);
-                if(choice2 != 0) return false;
-            }
+        // If current scaling does not match with what is recorded:
+        if(scale != scaleFactor) {
+            choice = JOptionPane.showConfirmDialog(null,
+                    "The scale factor of " + scale + "x does not match the current scale factor. Proceed anyway?",
+                    "Warning!",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+            return choice == 0;
         }
         return true;
     }
