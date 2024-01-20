@@ -61,7 +61,7 @@ public class MacroPlayer extends JPanel {
     private boolean validateScale() throws IOException {
         String temp;
         int choice;
-        double scale = 0;
+        double scale;
         // Read the first line only, which SHOULD be scaling information
         temp = br.readLine();
         // If scaling information is not present:

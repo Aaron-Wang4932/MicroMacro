@@ -18,19 +18,17 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class MacroPanel extends GradientPanel implements ActionListener, KeyListener{
-    private JButton loadPlayBtn;
-    private JButton recBtn;
-    private JButton stopBtn;
-    private JButton saveBtn;
-    private JButton backBtn;
-    private JTextArea macroReadout = new JTextArea();
-    private JScrollPane readoutScroller;
-    private ActionListener gui;
-    private JFrame frame;
+    private final JButton loadPlayBtn;
+    private final JButton recBtn;
+    private final JButton stopBtn;
+    private final JButton saveBtn;
+    private final JButton backBtn;
+    private final JTextArea macroReadout = new JTextArea();
+    private final ActionListener gui;
     private final MacroRecorder macroRecorder;
     private static int delay;
-    private static int[] keybinds = new int[2];
-    private int[] potentialKeybindsIDK = new int[2];
+    private static final int[] keybinds = new int[2];
+    private final int[] potentialKeybindsIDK = new int[2];
 
     {
         try {
@@ -48,7 +46,6 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
         this.setPreferredSize(new Dimension(1000, 624));
         this.setLayout(null);
         this.gui = gui;
-        this.frame = (JFrame) gui;
 
         JLabel title = new JLabel("Macro Recorder", JLabel.CENTER);
         title.setForeground(new Color(0xcdc2db)); // Secondary
@@ -106,7 +103,7 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
         macroReadout.setCaretColor(new Color(0xe9def8));
         macroReadout.setEditable(false);
 
-        readoutScroller = new JScrollPane(macroReadout, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane readoutScroller = new JScrollPane(macroReadout, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         readoutScroller.getViewport().setOpaque(false);
         readoutScroller.setOpaque(false);
 
@@ -235,7 +232,7 @@ public class MacroPanel extends GradientPanel implements ActionListener, KeyList
         try {
             macroPlayer = new MacroPlayer(loadedFile);
         } catch (AWTException e) {
-            JOptionPane.showMessageDialog(this.getParent(), "Something went wrong!!!!!! aaaaaaa", "help me", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this.getParent(), "Something went wrong!!!!!!", "help me", JOptionPane.ERROR_MESSAGE);
         }
 
         boolean entryIsNum = false;

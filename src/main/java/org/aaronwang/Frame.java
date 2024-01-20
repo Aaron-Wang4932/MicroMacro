@@ -8,13 +8,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
-
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 public class Frame extends JFrame implements ActionListener {
@@ -33,7 +30,7 @@ public class Frame extends JFrame implements ActionListener {
         this.setVisible(true);
 
         // Show the only implemented startup hint if required.
-        String temp = "";
+        String temp;
         boolean showHints;
         try {
             BufferedReader br = new BufferedReader(new FileReader("resources/config.txt"));

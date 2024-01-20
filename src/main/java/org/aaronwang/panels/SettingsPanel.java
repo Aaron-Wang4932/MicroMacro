@@ -11,18 +11,17 @@ import java.util.*;
 import java.util.List;
 
 public class SettingsPanel extends GradientPanel implements ActionListener, FocusListener, KeyListener {
-    private ActionListener gui;
-    private JButton backButton;
-    private JTextField recordDelayField;
-    private JTextField keybindField;
-    private Border keybindFieldDefaultBorder;
-    private JComboBox<String> themeSelector;
-    private JToggleButton hintsToggle;
-    private ArrayList<Integer> enteredKeybinds = new ArrayList<>(List.of(0)); // Keeps track of keybinds in progress of being entered
-    private int[] keybinds = new int[2]; // keeps track of keybind codes
+    private final ActionListener gui;
+    private final JButton backButton;
+    private final JTextField recordDelayField;
+    private final JTextField keybindField;
+    private final Border keybindFieldDefaultBorder;
+    private final JComboBox<String> themeSelector;
+    private final JToggleButton hintsToggle;
+    private final ArrayList<Integer> enteredKeybinds = new ArrayList<>(List.of(0)); // Keeps track of keybinds in progress of being entered
+    private final int[] keybinds = new int[2]; // keeps track of keybind codes
     private String keybindString; // Keeps track of keybinds as a string representation
     private int recordingDelayMS;
-    private String theme;
     private boolean showHints;
     public SettingsPanel(ActionListener gui) {
         // Constructs settings panel with gradient!!
@@ -158,7 +157,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
                     keybindString = keybindString.replace("null", "");
                 } else if(temp.startsWith("theme: ")) {
                     temp = temp.replace("theme: ", "");
-                    theme = temp;
+                    String theme = temp;
                 } else if(temp.startsWith("show-startup-hints: ")) {
                     temp = temp.replace("show-startup-hints: ", "");
                     showHints = Boolean.parseBoolean(temp);
@@ -248,7 +247,7 @@ public class SettingsPanel extends GradientPanel implements ActionListener, Focu
             hintsToggle.setText((showHints + "").substring(0, 1).toUpperCase() + (showHints + "").substring(1).toLowerCase());
 
             return;
-        };
+        }
 
         try {
             Integer.parseInt(recordDelayField.getText());
