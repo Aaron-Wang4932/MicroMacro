@@ -139,8 +139,8 @@ public class MacroPlayer extends JPanel {
             mouseCode = Integer.parseInt(cmd);
             mouseCode = switch (mouseCode) {
                 case 1 -> InputEvent.BUTTON1_DOWN_MASK;
-                case 2 -> InputEvent.BUTTON2_DOWN_MASK;
-                case 3 -> InputEvent.BUTTON3_DOWN_MASK;
+                case 2 -> InputEvent.BUTTON3_DOWN_MASK; // JNativeHook right click (2) corresponds to Java's button 3.
+                case 3 -> InputEvent.BUTTON2_DOWN_MASK; // JNativeHook scroll wheel (3) corresponds to Java's button 2.
                 default -> mouseCode;
             };
         } catch (NumberFormatException nfe) {
